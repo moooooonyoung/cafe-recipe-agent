@@ -4,17 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-The repo currently contains only `PLAN.md` (the agreed design) and an empty `README.md`. No code, `package.json`, or tooling exists yet. `PLAN.md` is the source of truth: read it before building anything, and keep it updated if a decision changes. Deadline is 2026-11-01, solo project; the day-by-day schedule and the feature freeze on 10/31 are in `PLAN.md` §5.
+`PLAN.md` is the source of truth for the design: read it before building anything, and keep it updated if a decision changes. Deadline is 2026-11-01, solo project; the day-by-day schedule and the feature freeze on 10/31 are in `PLAN.md` §5. Step 1 (project setup) is done; check `git log` for how far the steps have progressed.
 
 ## Working rules
 
 - Implement in the step order given in `PLAN.md` §5.
 - When a step is done, run the tests and show the user the results first, then commit.
 - Keep the code simple enough that the author can explain it themselves.
+- Create and edit files with the file tools (Write/Edit), not shell commands (heredocs, `sed`, scripts that rewrite files).
 
 ## Commands
 
-None exist yet. The planned stack is React + Vite + TypeScript with Vitest, no backend. Once scaffolded, record the real dev, build, test, and single-test commands here.
+Node is installed through nvm, so a non-interactive shell needs `. ~/.nvm/nvm.sh` first.
+
+- `npm run dev`: Vite dev server
+- `npm run build`: type-check (`tsc`) then production build into `dist/`
+- `npm test`: run all Vitest tests once; `npm run test:watch` for watch mode
+- Single test file: `npx vitest run src/i18n/i18n.test.ts`; by test name: `npx vitest run -t "<name>"`
 
 ## What this is
 

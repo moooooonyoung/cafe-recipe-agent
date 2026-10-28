@@ -8,7 +8,7 @@ import { lemonAde } from '../data/menus/lemon_ade'
 import { matchaLatte } from '../data/menus/matcha_latte'
 import { oatLatte } from '../data/menus/oat_latte'
 import { strawberryLatte } from '../data/menus/strawberry_latte'
-import { menuStatus, optionChoices, statusOf } from './status'
+import { menuStatus, optionChoices, statusOf, unavailableTemps } from './status'
 import { resolveOrder } from './substitution'
 import { opts, soldOut } from './testHelpers'
 
@@ -22,7 +22,7 @@ describe('메뉴 카드 상태', () => {
   it('오트밀크 품절이면 오트 라떼 카드가 대체 필요이고 이유에 대체 재료가 나온다', () => {
     expect(menuStatus(oatLatte, soldOut('oat_milk'))).toEqual({
       status: 'substitute',
-      reason: '오트밀크 → 우유 대체',
+      reasons: ['오트밀크 → 우유 대체'],
     })
   })
 
@@ -33,7 +33,7 @@ describe('메뉴 카드 상태', () => {
     // 기본 당도가 '보통'인 말차 라떼는 카드에서도 같다
     expect(menuStatus(matchaLatte, soldOut('syrup'))).toEqual({
       status: 'substitute',
-      reason: '시럽 → 바닐라 시럽 대체',
+      reasons: ['시럽 → 바닐라 시럽 대체'],
     })
   })
 
@@ -41,7 +41,7 @@ describe('메뉴 카드 상태', () => {
     const stock = soldOut('syrup', 'vanilla_syrup')
     expect(menuStatus(matchaLatte, stock)).toEqual({
       status: 'substitute',
-      reason: '시럽 품절 · 당도 없음만 가능',
+      reasons: ['시럽 품절 · 당도 없음만 가능'],
     })
     const sweetness = optionChoices(matchaLatte, opts({ sweetness: 'none' }), stock).sweetness
     expect(sweetness.find((c) => c.value === 'none')?.disabled).toBe(false)
@@ -56,8 +56,8 @@ describe('메뉴 카드 상태', () => {
   })
 
   it('탄산수 품절이면 레몬에이드는 제조 불가다 (대체 후보가 없다)', () => {
-    expect(menuStatus(lemonAde, soldOut('sparkling_water'))).toEqual({ status: 'blocked', reason: '탄산수 품절' })
-    expect(menuStatus(grapefruitAde, soldOut('sparkling_water'))).toEqual({ status: 'blocked', reason: '탄산수 품절' })
+    expect(menuStatus(lemonAde, soldOut('sparkling_water'))).toEqual({ status: 'blocked', reasons: ['탄산수 품절'] })
+    expect(menuStatus(grapefruitAde, soldOut('sparkling_water'))).toEqual({ status: 'blocked', reasons: ['탄산수 품절'] })
   })
 
   it('물은 항상 있는 재료라 품절로 바꿔도 아메리카노를 만들 수 있다', () => {
@@ -69,21 +69,59 @@ describe('메뉴 카드 상태', () => {
     const coffee = menus.filter((m) => m.category === 'coffee')
     expect(coffee.length).toBeGreaterThan(0)
     for (const menu of coffee) {
-      expect(menuStatus(menu, stock), menu.id).toEqual({ status: 'blocked', reason: '에스프레소 품절' })
+      expect(menuStatus(menu, stock), menu.id).toEqual({ status: 'blocked', reasons: ['에스프레소 품절'] })
     }
     // 커피가 아닌 메뉴는 영향이 없다
     expect(menuStatus(matchaLatte, stock)).toEqual({ status: 'ok' })
   })
 
   it('대체 불가로 지정된 재료가 품절이면 카드가 바로 제조 불가가 된다', () => {
-    expect(menuStatus(cappuccino, soldOut('milk'))).toEqual({ status: 'blocked', reason: '우유 품절' })
+    expect(menuStatus(cappuccino, soldOut('milk'))).toEqual({ status: 'blocked', reasons: ['우유 품절'] })
   })
 
   it("얼음이 품절이면 아이스가 기본인 메뉴 카드는 '얼음 품절 · HOT만 가능'인 대체 필요가 된다", () => {
     expect(menuStatus(latte, soldOut('ice'))).toEqual({
       status: 'substitute',
-      reason: '얼음 품절 · HOT만 가능',
+      reasons: ['얼음 품절 · HOT만 가능'],
     })
+  })
+
+  it('이유가 겹치면 카드 배지에 한 줄씩 모두 보여준다 (얼음 품절 + 오트밀크 품절)', () => {
+    expect(menuStatus(oatLatte, soldOut('ice', 'oat_milk'))).toEqual({
+      status: 'substitute',
+      reasons: ['얼음 품절 · HOT만 가능', '오트밀크 → 우유 대체'],
+    })
+  })
+
+  it('겹친 이유의 대체 재료는 다음 순위 후보를 따른다 (우유도 품절이면 두유)', () => {
+    expect(menuStatus(oatLatte, soldOut('ice', 'oat_milk', 'milk')).reasons).toEqual([
+      '얼음 품절 · HOT만 가능',
+      '오트밀크 → 두유 대체',
+    ])
+  })
+
+  it('얼음 품절과 시럽 품절이 겹치면 시럽 대체 이유도 보여준다', () => {
+    // 말차 라떼는 기본이 아이스 + 당도 보통이라 시럽이 필요하다
+    expect(menuStatus(matchaLatte, soldOut('ice', 'syrup')).reasons).toEqual([
+      '얼음 품절 · HOT만 가능',
+      '시럽 → 바닐라 시럽 대체',
+    ])
+  })
+
+  it('기본 옵션에서 대체할 재료가 여럿이면 한 줄씩 나온다', () => {
+    // 말차 라떼: 기본 아이스 + 당도 보통. 우유와 시럽이 모두 품절이면 둘 다 대체가 필요하다
+    expect(menuStatus(matchaLatte, soldOut('milk', 'syrup')).reasons).toEqual([
+      '우유 → 오트밀크 대체',
+      '시럽 → 바닐라 시럽 대체',
+    ])
+  })
+
+  it('바꾼 옵션으로 만들 때 대체가 필요 없으면 대체 이유를 붙이지 않는다', () => {
+    expect(menuStatus(oatLatte, soldOut('ice')).reasons).toEqual(['얼음 품절 · HOT만 가능'])
+  })
+
+  it('겹친 이유 때문에 어느 옵션으로도 못 만들면 처음 막힌 이유만 보여준다', () => {
+    expect(menuStatus(oatLatte, soldOut('ice', 'espresso'))).toEqual({ status: 'blocked', reasons: ['얼음 품절'] })
   })
 
   it('얼음이 품절이어도 핫만 파는 메뉴는 정상이다', () => {
@@ -91,7 +129,7 @@ describe('메뉴 카드 상태', () => {
   })
 
   it('얼음이 품절이고 아이스만 파는 메뉴는 제조 불가다', () => {
-    expect(menuStatus(strawberryLatte, soldOut('ice'))).toEqual({ status: 'blocked', reason: '얼음 품절' })
+    expect(menuStatus(strawberryLatte, soldOut('ice'))).toEqual({ status: 'blocked', reasons: ['얼음 품절'] })
   })
 
   it('재고를 바꾸면 카드 상태도 다시 계산된다', () => {
@@ -99,6 +137,29 @@ describe('메뉴 카드 상태', () => {
     expect(menuStatus(oatLatte, soldOut('oat_milk')).status).toBe('substitute')
     expect(menuStatus(oatLatte, soldOut('oat_milk', 'milk', 'soy_milk')).status).toBe('blocked')
     expect(menuStatus(oatLatte, soldOut()).status).toBe('ok')
+  })
+})
+
+describe('메뉴 카드의 불가능한 온도', () => {
+  it('얼음이 품절이면 아이스가 안 되는 온도로 나온다', () => {
+    expect(unavailableTemps(latte, soldOut('ice'))).toEqual(['ice'])
+    expect(unavailableTemps(oatLatte, soldOut('ice'))).toEqual(['ice'])
+  })
+
+  it('재고가 모두 있으면 안 되는 온도가 없다', () => {
+    for (const menu of menus) expect(unavailableTemps(menu, soldOut()), menu.id).toEqual([])
+  })
+
+  it('원두가 품절이면 어느 온도도 안 되므로 온도를 표시하지 않는다', () => {
+    expect(unavailableTemps(latte, soldOut('espresso'))).toEqual([])
+  })
+
+  it('아이스만 파는 메뉴는 얼음이 품절이어도 온도를 표시하지 않는다 (카드의 제조 불가 배지가 알려준다)', () => {
+    expect(unavailableTemps(strawberryLatte, soldOut('ice'))).toEqual([])
+  })
+
+  it('핫만 파는 메뉴는 얼음이 품절이어도 영향이 없다', () => {
+    expect(unavailableTemps(cappuccino, soldOut('ice'))).toEqual([])
   })
 })
 

@@ -1,5 +1,5 @@
 import type { Unit } from '../../data/ingredients'
-import type { FillLevel, Sweetness, Temperature } from '../../data/types'
+import type { Category, FillLevel, Sweetness, Temperature } from '../../data/types'
 
 // 화면에 보이는 한국어 문구. 영어를 추가하면 en.ts를 같은 모양으로 만든다.
 export const ko = {
@@ -23,9 +23,27 @@ export const ko = {
     pump: '펌프',
     ea: '개',
   } satisfies Record<Unit, string>,
+  // 아이스·핫은 색과 글자를 함께 쓴다(색만으로 구분하지 않는다)
+  temp: {
+    ice: 'ICE ❄️',
+    hot: 'HOT 🔥',
+  } satisfies Record<Temperature, string>,
+  // 메뉴 선택 화면
+  menu: {
+    openStock: '재고 관리',
+    category: {
+      coffee: '커피',
+      'non-coffee': '논커피',
+      'tea-ade': '티·에이드',
+    } satisfies Record<Category, string>,
+    substitute: '대체 필요',
+    blocked: '✕ 제조 불가',
+    tempOff: '불가', // 안 되는 온도 칩(취소선)을 화면 낭독기에 알린다
+  },
   // 재고 관리 화면
   stock: {
     title: '재고 관리',
+    back: '메뉴로 돌아가기',
     hint: '재료를 누르면 있음과 품절이 바뀝니다',
     inStock: '있음',
     soldOut: '품절',

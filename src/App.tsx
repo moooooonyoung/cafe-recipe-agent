@@ -1,8 +1,17 @@
+import { useState } from 'react'
+import MenuScreen from './screens/MenuScreen'
 import StockScreen from './screens/StockScreen'
 import { useStock } from './useStock'
 
-// 5단계에서 메뉴 선택 화면이 생기기 전까지는 재고 관리 화면만 보여준다.
+// 라우팅 라이브러리 없이 화면 상태로 전환한다. 6단계에서 옵션 화면과 가이드 화면이 더해진다.
+type Screen = 'menu' | 'stock'
+
 export default function App() {
+  const [screen, setScreen] = useState<Screen>('menu')
   const { stock, toggle, reset } = useStock()
-  return <StockScreen stock={stock} onToggle={toggle} onReset={reset} />
+
+  if (screen === 'stock') {
+    return <StockScreen stock={stock} onToggle={toggle} onReset={reset} onBack={() => setScreen('menu')} />
+  }
+  return <MenuScreen stock={stock} onOpenStock={() => setScreen('stock')} />
 }

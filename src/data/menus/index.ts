@@ -1,3 +1,4 @@
+import type { Category } from '../types'
 import { americano } from './americano'
 import { cappuccino } from './cappuccino'
 import { chamomileTea } from './chamomile_tea'
@@ -26,3 +27,6 @@ export const menus = [
 ] as const
 
 export type MenuId = (typeof menus)[number]['id']
+
+// 메뉴 화면에서 카테고리가 보이는 순서
+export const categoryOrder: readonly Category[] = ['coffee', 'non-coffee', 'tea-ade']

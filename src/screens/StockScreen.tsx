@@ -8,6 +8,7 @@ type Props = {
   stock: Stock
   onToggle: (id: IngredientId) => void
   onReset: () => void
+  onBack: () => void
 }
 
 // 재고 화면에 보이는 재료: 항상 있는 재료(물)는 뺀다
@@ -18,7 +19,7 @@ const items = (Object.keys(ingredients) as IngredientId[]).filter((id) => {
 
 const t = strings.stock
 
-export default function StockScreen({ stock, onToggle, onReset }: Props) {
+export default function StockScreen({ stock, onToggle, onReset, onBack }: Props) {
   // 초기화는 실수로 누르기 쉬워서 한 번 더 묻는다
   const [asking, setAsking] = useState(false)
 
@@ -28,6 +29,10 @@ export default function StockScreen({ stock, onToggle, onReset }: Props) {
   return (
     <main className="stock">
       <header className="stock__header">
+        <button type="button" className="btn" onClick={onBack}>
+          {t.back}
+        </button>
+
         <div className="stock__heading">
           <h1 className="stock__title">{t.title}</h1>
           <p className="stock__hint">{t.hint}</p>

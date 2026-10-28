@@ -51,6 +51,78 @@ button {
   color: var(--color-surface);
 }
 
+/* 아이스·핫 표시: 색과 글자(ICE ❄️ / HOT 🔥)를 함께 쓴다 */
+.temp {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  border: var(--border) solid;
+  border-radius: 999px;
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.temp--ice {
+  background: var(--color-ice-bg);
+  border-color: var(--color-ice);
+  color: var(--color-ice-ink);
+}
+
+.temp--hot {
+  background: var(--color-hot-bg);
+  border-color: var(--color-hot);
+  color: var(--color-hot-ink);
+}
+
+/* 안 되는 온도: 흐리게 + 취소선(색에 기대지 않는다) */
+.temp--off {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+/* 화면에는 안 보이고 화면 낭독기에만 읽히는 글자 */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 상태 배지: 대체 필요(노랑)와 제조 불가(빨강). 글자가 상태를 말하고 색은 거든다 */
+.badge {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border) solid;
+  border-radius: 8px;
+  line-height: var(--line-height-tight);
+}
+
+.badge__label {
+  display: block;
+  font-weight: var(--font-weight-bold);
+}
+
+/* 이유는 한 줄에 하나씩 */
+.badge__line {
+  display: block;
+}
+
+.badge--sub {
+  background: var(--color-sub-bg);
+  border-color: var(--color-sub);
+  color: var(--color-sub-ink);
+}
+
+.badge--danger {
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger);
+  color: var(--color-danger-ink);
+}
+
 .btn:disabled {
   border-color: var(--color-line);
   color: var(--color-ink-disabled);

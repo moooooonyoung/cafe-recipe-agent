@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { ingredientNames, menuText, strings, substitutionNotes } from '../i18n'
 import type { MenuText } from '../i18n/types'
 import { ingredients, type IngredientId, type IngredientInfo } from './ingredients'
-import { menus, type MenuId } from './menus'
+import { categoryOrder, menus, type MenuId } from './menus'
 import { baseDefaults, sweetnessPumps } from './options'
 import { defaultStock } from './stock'
 import { substitutions } from './substitutions'
@@ -93,7 +93,7 @@ describe('메뉴 데이터', () => {
   it('모든 메뉴에 필수 항목(id, 카테고리, 온도, 온도별 레시피)이 있다', () => {
     for (const menu of allMenus) {
       expect(menu.id, 'id').toBeTruthy()
-      expect(['coffee', 'non-coffee', 'tea-ade'], `${menu.id} 카테고리`).toContain(menu.category)
+      expect(categoryOrder, `${menu.id} 카테고리`).toContain(menu.category)
       expect(menu.temps.length, `${menu.id} 온도`).toBeGreaterThan(0)
       // 지원하는 온도마다 레시피가 있고, 지원하지 않는 온도의 레시피는 없다
       expect(Object.keys(menu.recipes).sort(), `${menu.id} 레시피 온도`).toEqual([...menu.temps].sort())
@@ -101,6 +101,17 @@ describe('메뉴 데이터', () => {
         expect(Object.keys(menu.recipes[temp] ?? {}).length, `${menu.id}/${temp} 재료`).toBeGreaterThan(0)
       }
     }
+  })
+
+  it('메뉴 화면의 모든 카테고리에 메뉴가 하나 이상 있고 카테고리 순서에 중복이 없다', () => {
+    expect(new Set(categoryOrder).size).toBe(categoryOrder.length)
+    for (const category of categoryOrder) {
+      expect(allMenus.filter((m) => m.category === category).length, category).toBeGreaterThan(0)
+    }
+  })
+
+  it('모든 카테고리에 한국어 이름이 있다', () => {
+    for (const category of categoryOrder) expect(strings.menu.category[category]?.length, category).toBeGreaterThan(0)
   })
 
   it('레시피의 재료 id가 실제 재료 목록에 존재한다', () => {

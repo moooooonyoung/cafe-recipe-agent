@@ -19,35 +19,40 @@ export function blockedReason(lines: readonly ResolvedLine[]): string {
   return blocked ? strings.reason.soldOut(ingredientNames[blocked.id]) : ''
 }
 
-// 대체가 필요한 이유. 예: '오트밀크 → 우유 대체'
-export function substituteReason(lines: readonly ResolvedLine[]): string {
+// 대체가 필요한 이유, 재료마다 한 줄. 예: ['오트밀크 → 우유 대체']
+export function substituteReasons(lines: readonly ResolvedLine[]): string[] {
   return lines
     .filter((l) => l.state === 'suggest' || l.state === 'substituted')
     .map((l) => {
       const to = l.state === 'suggest' ? l.candidate!.id : l.use
       return strings.reason.substitute(ingredientNames[l.id], ingredientNames[to])
     })
-    .join(', ')
 }
 
-export type MenuStatus = { status: Status; reason?: string }
+// reasons: 카드 배지에 한 줄씩 보여줄 이유
+export type MenuStatus = { status: Status; reasons?: string[] }
 
 // 메뉴 카드 상태: 기본 옵션 기준. 기본 옵션으로는 못 만들어도 옵션 하나를 바꿔서
 // 만들 수 있으면 '제조 불가' 대신 '대체 필요'로 보여주고, 이유에 바꿀 옵션을 적는다.
+// 이유가 겹치면 모두 적는다. 예: ['얼음 품절 · HOT만 가능', '오트밀크 → 우유 대체']
 export function menuStatus(menu: Menu, stock: Stock): MenuStatus {
   const base = defaultOptions(menu)
   const lines = resolveOrder(menu, base, stock)
   const status = statusOf(lines)
   if (status === 'ok') return { status }
-  if (status === 'substitute') return { status, reason: substituteReason(lines) }
+  if (status === 'substitute') return { status, reasons: substituteReasons(lines) }
 
   const blocked = blockedReason(lines)
   for (const alt of alternatives(menu, base)) {
-    if (statusOf(resolveOrder(menu, alt.options, stock)) !== 'blocked') {
-      return { status: 'substitute', reason: blocked + strings.reason.separator + alt.label }
-    }
+    const altLines = resolveOrder(menu, alt.options, stock)
+    const altStatus = statusOf(altLines)
+    if (altStatus === 'blocked') continue
+    // 첫 줄: 막힌 이유와 바꿀 옵션. 바꾼 옵션으로 만들 때도 대체가 필요하면 그 이유를 다음 줄에 더한다.
+    const reasons = [blocked + strings.reason.separator + alt.label]
+    if (altStatus === 'substitute') reasons.push(...substituteReasons(altLines))
+    return { status: 'substitute', reasons }
   }
-  return { status: 'blocked', reason: blocked }
+  return { status: 'blocked', reasons: [blocked] }
 }
 
 // 재고 때문에 막히면 바꿔볼 만한 옵션: 온도, 당도(시럽이 필요한 메뉴만). 하나씩만 바꾼다.
@@ -64,6 +69,14 @@ function alternatives(menu: Menu, base: Options): { options: Options; label: str
     }
   }
   return list
+}
+
+// 메뉴 카드에서 흐리게 보여줄 온도: 기본 옵션 기준으로 만들 수 없는 온도.
+// 어느 온도로도 못 만들면(예: 원두 품절) 원인이 온도가 아니므로 표시하지 않는다.
+export function unavailableTemps(menu: Menu, stock: Stock): Temperature[] {
+  const choices = choicesFor(menu, defaultOptions(menu), stock, 'temp', menu.temps)
+  const blocked = choices.filter((c) => c.disabled).map((c) => c.value)
+  return blocked.length === choices.length ? [] : blocked
 }
 
 export type Choice<V> = { value: V; disabled: boolean; reason?: string }

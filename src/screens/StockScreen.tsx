@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { ingredients, type IngredientId, type IngredientInfo } from '../data/ingredients'
+import type { IngredientId } from '../data/ingredients'
 import { defaultStock, type Stock } from '../data/stock'
 import { ingredientNames, strings } from '../i18n'
+import { stockListIds } from '../logic/stock'
 import './StockScreen.css'
 
 type Props = {
@@ -11,11 +12,8 @@ type Props = {
   onBack: () => void
 }
 
-// 재고 화면에 보이는 재료: 항상 있는 재료(물)는 뺀다
-const items = (Object.keys(ingredients) as IngredientId[]).filter((id) => {
-  const info: IngredientInfo = ingredients[id]
-  return !info.alwaysAvailable
-})
+// 재고 화면에 보이는 재료: 항상 있는 재료(물)는 빼고, 이름 순(한국어는 ㄱㄴㄷ순)
+const items = stockListIds()
 
 const t = strings.stock
 

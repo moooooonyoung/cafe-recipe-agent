@@ -3,6 +3,8 @@ import type { Category, ExtraShots, FillLevel, Size, Sweetness, Temperature } fr
 
 // 화면에 보이는 한국어 문구. 영어를 추가하면 en.ts를 같은 모양으로 만든다.
 export const ko = {
+  // 이 언어의 정렬 기준(Intl.Collator에 넘긴다). 영어를 추가하면 'en'.
+  locale: 'ko',
   appTitle: '카페 레시피 가이드',
   sweetness: {
     none: '없음',

@@ -14,8 +14,11 @@ export type Options = {
   sweetness: Sweetness // 메뉴에 sweetener가 있을 때만 사용
 }
 
-// 재료 양: 레귤러/라지를 각각 직접 적는다(배율 계산 없음).
-export type Amount = { regular: number; large: number }
+// 재고·배율 계산 없이 컵에 맞춰 채우는 양. 숫자 대신 적는다(문구는 src/i18n/ko/ui.ts의 fillLevel).
+export type FillLevel = 'to-line' | 'to-full'
+
+// 재료 양: 레귤러/라지를 각각 직접 적는다(배율 계산 없음). 숫자 또는 FillLevel.
+export type Amount = { regular: number | FillLevel; large: number | FillLevel }
 
 // 한 온도에서 쓰는 재료와 양. 샷 추가와 당도로 더해지는 양은 여기에 적지 않는다.
 export type Recipe = Partial<Record<IngredientId, Amount>>

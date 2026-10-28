@@ -1,5 +1,6 @@
 import type { Menu } from '../types'
 
+// 출처: 샘플 값(층을 살려 전달하는 단계는 검토에서 정함).
 // 아이스만 판다. 딸기 퓨레가 단맛을 내서 시럽 당도는 기본 없음.
 export const strawberryLatte = {
   id: 'strawberry_latte',

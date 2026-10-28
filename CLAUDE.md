@@ -52,4 +52,4 @@ A Korean-language drink recipe guide for cafe part-timers, used on a landscape t
 
 ## Data caveats
 
-Several values in `PLAN.md` §6 are marked "매장 기준 확인 필요" (menu lineup, syrup pumps per sweetness level, default options). They are placeholders until the owner reviews them against the real store. Don't treat them as final.
+Data values carry a source comment. `근무 경험 기준` means it comes from the author's own cafe work (a value they were unsure of is marked `추정`). `샘플 값` means a placeholder Claude made up, including the `PLAN.md` §6 items marked `[샘플 값]` (menu lineup, syrup pumps per sweetness level, default options). Sample values stay placeholders until the owner reviews them against the real store, so don't treat them as final. Don't change a `근무 경험 기준` value without asking.

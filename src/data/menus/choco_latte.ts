@@ -1,5 +1,6 @@
 import type { Menu } from '../types'
 
+// 출처: 샘플 값.
 // 초코 소스가 기본 단맛이라 시럽 당도는 기본 없음.
 export const chocoLatte = {
   id: 'choco_latte',

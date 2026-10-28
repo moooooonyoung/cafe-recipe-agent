@@ -6,7 +6,7 @@ export const chamomileTea: MenuText = {
     hot: [
       '컵에 {chamomile_teabag} 넣기',
       '뜨거운 {water} 붓기',
-      '충분히 우려낸 뒤 {chamomile_teabag} 꺼내기',
+      '3분 우린 뒤 {chamomile_teabag} 꺼내기',
       '{syrup} 넣고 저어 섞기',
       '뚜껑을 닫아 전달하기',
     ],

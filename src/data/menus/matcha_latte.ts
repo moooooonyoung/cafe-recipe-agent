@@ -1,5 +1,6 @@
 import type { Menu } from '../types'
 
+// 출처: 샘플 값.
 export const matchaLatte = {
   id: 'matcha_latte',
   category: 'non-coffee',

@@ -1,5 +1,6 @@
 import type { Menu } from '../types'
 
+// 출처: 샘플 값.
 // 핫만 판다. 거품이 핵심이라 우유는 대체 불가.
 export const cappuccino = {
   id: 'cappuccino',

@@ -1,5 +1,6 @@
 import type { Menu } from '../types'
 
+// 출처: 샘플 값(3분 우리는 단계는 검토에서 정함).
 // 핫만 판다.
 export const chamomileTea = {
   id: 'chamomile_tea',

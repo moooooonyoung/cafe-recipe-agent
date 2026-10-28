@@ -1,7 +1,10 @@
 import type { IngredientId } from './ingredients'
 
-// 기본 재고. true = 있음, false = 품절. [초기화] 버튼을 누르면 이 상태로 돌아간다.
-export const defaultStock: Record<IngredientId, boolean> = {
+// true = 있음, false = 품절
+export type Stock = Record<IngredientId, boolean>
+
+// 기본 재고. [초기화] 버튼을 누르면 이 상태로 돌아간다.
+export const defaultStock: Stock = {
   espresso: true,
   milk: true,
   oat_milk: true,

@@ -1,4 +1,5 @@
-import type { FillLevel, Sweetness } from '../../data/types'
+import type { Unit } from '../../data/ingredients'
+import type { FillLevel, Sweetness, Temperature } from '../../data/types'
 
 // 화면에 보이는 한국어 문구. 영어를 추가하면 en.ts를 같은 모양으로 만든다.
 export const ko = {
@@ -14,4 +15,20 @@ export const ko = {
     'to-line': '컵 선까지',
     'to-full': '컵 가득',
   } satisfies Record<FillLevel, string>,
+  // 숫자 양 뒤에 붙는 단위
+  unit: {
+    ml: 'ml',
+    g: 'g',
+    shot: '샷',
+    pump: '펌프',
+    ea: '개',
+  } satisfies Record<Unit, string>,
+  // 메뉴 카드 배지와 옵션 선택지에 붙는 짧은 사유
+  reason: {
+    soldOut: (name: string) => `${name} 품절`,
+    substitute: (from: string, to: string) => `${from} → ${to} 대체`,
+    onlyTemp: { hot: 'HOT만 가능', ice: 'ICE만 가능' } satisfies Record<Temperature, string>,
+    onlySweetness: (label: string) => `당도 ${label}만 가능`,
+    separator: ' · ',
+  },
 }

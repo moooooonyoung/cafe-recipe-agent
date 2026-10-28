@@ -1,0 +1,77 @@
+/*
+  모든 화면이 같이 쓰는 디자인 규칙(CSS 변수). 값을 바꾸려면 여기만 고친다.
+  가로 태블릿(약 10인치, 터치) 기준이고, 노트북 브라우저에서도 같은 규칙으로 깨지지 않게 쓴다.
+  라이트 모드만 있다.
+
+  색 규칙
+  - 아이스는 파랑 + 'ICE ❄️', 핫은 주황 + 'HOT 🔥'. 색만으로 구분하지 않는다.
+  - 노랑은 '대체 필요' 배지에만 쓴다.
+  - 빨강은 품절·제조 불가 같은 경고에만 쓴다.
+  - 그 밖의 버튼과 글자는 무채색(ink)이다. 위 색이 의미를 잃지 않게 다른 곳에 쓰지 않는다.
+  - 각 색은 바탕(-bg), 글자(-ink), 테두리·강조(기본) 세 가지가 한 벌이다.
+*/
+:root {
+  /* 바탕과 글자 */
+  --color-bg: #f5f6f8;
+  --color-surface: #ffffff;
+  --color-ink: #1b1f24;
+  --color-ink-muted: #4b5563;
+  --color-ink-disabled: #6b7280;
+  /* 카드·버튼 테두리: 눌러야 하는 영역의 경계가 보이도록 바탕과 3:1 이상 */
+  --color-line: #858e9b;
+
+  /* 아이스: 파랑 */
+  --color-ice: #1d6fd6;
+  --color-ice-bg: #e4effc;
+  --color-ice-ink: #0b4a9e;
+
+  /* 핫: 주황 */
+  --color-hot: #e8590c;
+  --color-hot-bg: #ffebdd;
+  --color-hot-ink: #a63a00;
+
+  /* 대체 필요: 노랑 */
+  --color-sub: #f2b705;
+  --color-sub-bg: #fff1b8;
+  --color-sub-ink: #5c4300;
+
+  /* 품절·제조 불가: 빨강(경고에만) */
+  --color-danger: #c62828;
+  --color-danger-bg: #fde8e8;
+  --color-danger-ink: #9b1c1c;
+
+  /* 키보드·마우스로 쓸 때 보이는 포커스 링 */
+  --color-focus: var(--color-ink);
+
+  /* 글자 크기(PLAN §6): 본문 최소 18px, 단계 문장 24px 이상, 옵션 요약 32px 이상 */
+  --font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --font-size-body: 1.125rem; /* 18px */
+  --font-size-card: 1.5rem; /* 24px: 카드 제목, 큰 버튼 글자 */
+  --font-size-step: 1.5rem; /* 24px: 가이드 단계 문장(이 값 이상) */
+  --font-size-title: 1.75rem; /* 28px: 화면 제목 */
+  --font-size-summary: 2rem; /* 32px: 옵션 요약(이 값 이상) */
+  --font-weight-regular: 500;
+  --font-weight-bold: 700;
+  --line-height-body: 1.5;
+  --line-height-tight: 1.25;
+
+  /* 터치 영역: 최소 48px, 가능하면 56px 이상 */
+  --touch-min: 48px;
+  --touch: 56px;
+
+  /* 간격 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* 모서리와 테두리: 눌러야 하는 것은 2px 테두리로 경계를 분명히 한다 */
+  --radius: 12px;
+  --border: 2px;
+
+  /* 화면 폭: 노트북처럼 넓은 화면에서는 가운데에 최대 폭으로 둔다 */
+  --page-max: 1280px;
+  --page-pad: clamp(16px, 3vw, 32px);
+}

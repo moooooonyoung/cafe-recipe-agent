@@ -1,8 +1,77 @@
-:root {
-  font-size: 18px;
-  font-family: system-ui, 'Noto Sans KR', sans-serif;
+/* 기본 스타일과 모든 화면이 같이 쓰는 버튼. 값은 styles/tokens.css의 변수를 쓴다. */
+@import './styles/tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+  -webkit-text-size-adjust: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  /* 눌러서 쓰는 화면이라 더블 탭 확대와 글자 선택을 막는다 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* 공통 버튼: 높이 56px, 글자 18px 이상 */
+.btn {
+  min-height: var(--touch);
+  min-width: var(--touch);
+  padding: 0 var(--space-5);
+  border: var(--border) solid var(--color-ink);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+}
+
+.btn--primary {
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+
+.btn:disabled {
+  border-color: var(--color-line);
+  color: var(--color-ink-disabled);
+  cursor: not-allowed;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) {
+  .btn:hover:not(:disabled):not(.btn--primary) {
+    background: var(--color-bg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+  .btn:active:not(:disabled) {
+    transform: none;
+  }
 }

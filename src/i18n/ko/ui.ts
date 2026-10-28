@@ -23,6 +23,18 @@ export const ko = {
     pump: '펌프',
     ea: '개',
   } satisfies Record<Unit, string>,
+  // 재고 관리 화면
+  stock: {
+    title: '재고 관리',
+    hint: '재료를 누르면 있음과 품절이 바뀝니다',
+    inStock: '있음',
+    soldOut: '품절',
+    allInStock: '모두 있음',
+    soldOutCount: (n: number) => `품절 ${n}개`,
+    reset: '초기화',
+    resetAsk: '기본 재고로 되돌릴까요?',
+    resetCancel: '취소',
+  },
   // 메뉴 카드 배지와 옵션 선택지에 붙는 짧은 사유
   reason: {
     soldOut: (name: string) => `${name} 품절`,

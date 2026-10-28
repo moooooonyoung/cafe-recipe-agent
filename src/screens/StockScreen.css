@@ -1,0 +1,111 @@
+.stock {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--space-5) var(--page-pad) var(--space-6);
+}
+
+.stock__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+}
+
+.stock__heading {
+  margin-right: auto;
+}
+
+.stock__title {
+  margin: 0;
+  font-size: var(--font-size-title);
+  line-height: var(--line-height-tight);
+}
+
+.stock__hint {
+  margin: var(--space-1) 0 0;
+  color: var(--color-ink-muted);
+}
+
+.stock__summary {
+  margin: 0;
+  font-size: var(--font-size-card);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink-muted);
+}
+
+/* 빨강은 경고에만: 품절이 하나라도 있을 때만 쓴다 */
+.stock__summary--warn {
+  color: var(--color-danger-ink);
+}
+
+.stock__reset {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.stock__ask {
+  font-weight: var(--font-weight-bold);
+}
+
+/* 재료 카드: 한 장이 곧 토글 버튼. 가로 태블릿에서 4열, 넓은 노트북에서 5열 */
+.stock__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stock-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 96px;
+  padding: var(--space-4) var(--space-5);
+  border: var(--border) solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  text-align: left;
+  transition: background-color 120ms, border-color 120ms;
+}
+
+.stock-item__name {
+  font-size: var(--font-size-card);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.stock-item__state {
+  color: var(--color-ink-muted);
+}
+
+.stock-item--out {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+  color: var(--color-danger-ink);
+}
+
+.stock-item--out .stock-item__state {
+  color: var(--color-danger-ink);
+  font-weight: var(--font-weight-bold);
+}
+
+.stock-item:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) {
+  .stock-item:not(.stock-item--out):hover {
+    border-color: var(--color-ink-muted);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stock-item:active {
+    transform: none;
+  }
+}

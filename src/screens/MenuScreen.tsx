@@ -1,4 +1,4 @@
-import { categoryOrder, menus } from '../data/menus'
+import { categoryOrder, menus, type MenuId } from '../data/menus'
 import type { Stock } from '../data/stock'
 import type { Temperature } from '../data/types'
 import { menuText, strings } from '../i18n'
@@ -8,12 +8,13 @@ import './MenuScreen.css'
 type Props = {
   stock: Stock
   onOpenStock: () => void
+  onSelect: (menuId: MenuId) => void
 }
 
 const t = strings.menu
 const tempOrder: readonly Temperature[] = ['ice', 'hot']
 
-export default function MenuScreen({ stock, onOpenStock }: Props) {
+export default function MenuScreen({ stock, onOpenStock, onSelect }: Props) {
   return (
     <main className="menu">
       <header className="menu__header">
@@ -37,9 +38,11 @@ export default function MenuScreen({ stock, onOpenStock }: Props) {
                   // 정상 / 대체 필요 / 제조 불가는 재고가 바뀔 때마다 다시 계산한다
                   const { status, reasons = [] } = menuStatus(menu, stock)
                   const offTemps = unavailableTemps(menu, stock)
-                  return (
-                    <li key={menu.id} className={`menu-card menu-card--${status}`}>
-                      <div className="menu-card__main">
+
+                  // 카드 안은 button 안에 들어갈 수 있는 요소(span)만 쓴다
+                  const content = (
+                    <>
+                      <span className="menu-card__main">
                         <span className="menu-card__name">{menuText[menu.id].name}</span>
                         <span className="menu-card__temps">
                           {tempOrder
@@ -52,26 +55,35 @@ export default function MenuScreen({ stock, onOpenStock }: Props) {
                               </span>
                             ))}
                         </span>
-                      </div>
-                      {status === 'substitute' && (
-                        <p className="badge badge--sub">
-                          <span className="badge__label">{t.substitute}</span>
+                      </span>
+                      {status !== 'ok' && (
+                        <span className={status === 'blocked' ? 'badge badge--danger' : 'badge badge--sub'}>
+                          <span className="badge__label">{status === 'blocked' ? t.blocked : t.substitute}</span>
                           {reasons.map((line) => (
                             <span key={line} className="badge__line">
                               {line}
                             </span>
                           ))}
-                        </p>
+                        </span>
                       )}
-                      {status === 'blocked' && (
-                        <p className="badge badge--danger">
-                          <span className="badge__label">{t.blocked}</span>
-                          {reasons.map((line) => (
-                            <span key={line} className="badge__line">
-                              {line}
-                            </span>
-                          ))}
-                        </p>
+                    </>
+                  )
+
+                  return (
+                    <li key={menu.id}>
+                      {status === 'blocked' ? (
+                        // 제조 불가 카드는 누를 수 없다
+                        <div className="menu-card menu-card--blocked" aria-disabled="true">
+                          {content}
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className={`menu-card menu-card--${status}`}
+                          onClick={() => onSelect(menu.id)}
+                        >
+                          {content}
+                        </button>
                       )}
                     </li>
                   )

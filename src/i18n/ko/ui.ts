@@ -1,5 +1,5 @@
 import type { Unit } from '../../data/ingredients'
-import type { Category, FillLevel, Sweetness, Temperature } from '../../data/types'
+import type { Category, ExtraShots, FillLevel, Size, Sweetness, Temperature } from '../../data/types'
 
 // 화면에 보이는 한국어 문구. 영어를 추가하면 en.ts를 같은 모양으로 만든다.
 export const ko = {
@@ -28,6 +28,34 @@ export const ko = {
     ice: 'ICE ❄️',
     hot: 'HOT 🔥',
   } satisfies Record<Temperature, string>,
+  size: { regular: '레귤러', large: '라지' } satisfies Record<Size, string>,
+  shots: { 0: '추가 없음', 1: '+1샷', 2: '+2샷' } satisfies Record<ExtraShots, string>,
+  // 옵션 요약(가이드 화면 맨 위)
+  summary: {
+    shots: (n: number) => `샷 +${n}`,
+    sweetness: (label: string) => `당도 ${label}`,
+  },
+  // 옵션 확인 화면
+  options: {
+    back: '메뉴로 돌아가기',
+    temp: '온도',
+    size: '사이즈',
+    extraShots: '샷 추가',
+    sweetness: '당도',
+    start: '레시피 보기',
+    // 기본 옵션이 재고 때문에 막혀서 옵션을 자동으로 바꿨을 때의 안내. cause는 '얼음 품절' 같은 이유
+    notice: '안내',
+    switchedTemp: {
+      ice: (cause: string) => `${cause}로 ICE로 바꿨어요`,
+      hot: (cause: string) => `${cause}로 HOT으로 바꿨어요`,
+    } satisfies Record<Temperature, (cause: string) => string>,
+    switchedSweetness: (cause: string, label: string) => `${cause}로 당도를 바꿨어요 (${label})`,
+  },
+  // 제조 가이드 화면(7단계에서 채운다)
+  guide: {
+    back: '옵션 바꾸기',
+    placeholder: '제조 가이드는 7단계에서 만듭니다',
+  },
   // 메뉴 선택 화면
   menu: {
     openStock: '재고 관리',

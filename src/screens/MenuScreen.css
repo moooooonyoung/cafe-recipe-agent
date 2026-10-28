@@ -44,15 +44,28 @@
   list-style: none;
 }
 
+/* 정상·대체 필요 카드는 버튼(누르면 옵션 화면), 제조 불가 카드는 div(누를 수 없다) */
 .menu-card {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  width: 100%;
   min-height: var(--touch);
   padding: var(--space-3) var(--space-4);
   border: var(--border) solid var(--color-line);
   border-radius: var(--radius);
   background: var(--color-surface);
+  text-align: left;
+}
+
+button.menu-card:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) {
+  button.menu-card:hover {
+    border-color: var(--color-ink);
+  }
 }
 
 .menu-card__main {
@@ -83,6 +96,7 @@
 .menu-card--blocked {
   border-color: var(--color-danger);
   background: var(--color-bg);
+  cursor: not-allowed;
 }
 
 .menu-card--blocked .menu-card__main {

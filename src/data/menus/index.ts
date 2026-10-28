@@ -1,4 +1,4 @@
-import type { Category } from '../types'
+import type { Category, Menu } from '../types'
 import { americano } from './americano'
 import { cappuccino } from './cappuccino'
 import { chamomileTea } from './chamomile_tea'
@@ -27,6 +27,12 @@ export const menus = [
 ] as const
 
 export type MenuId = (typeof menus)[number]['id']
+
+export function getMenu(id: MenuId): Menu {
+  const menu = menus.find((m) => m.id === id)
+  if (!menu) throw new Error(`알 수 없는 메뉴: ${id}`)
+  return menu
+}
 
 // 메뉴 화면에서 카테고리가 보이는 순서
 export const categoryOrder: readonly Category[] = ['coffee', 'non-coffee', 'tea-ade']

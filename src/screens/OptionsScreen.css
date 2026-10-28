@@ -1,0 +1,154 @@
+.options {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--space-5) var(--page-pad) 0;
+}
+
+.options__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+}
+
+.options__title {
+  margin: 0;
+  font-size: var(--font-size-title);
+  line-height: var(--line-height-tight);
+}
+
+.options__notice {
+  margin-top: var(--space-3);
+}
+
+.options__header + .options__notice {
+  margin-top: var(--space-4);
+}
+
+.options__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.option-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* 좁은 창에서는 이름이 선택지 위로 올라간다 */
+@media (max-width: 720px) {
+  .option-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+}
+
+.option-row__label {
+  margin: 0;
+  font-size: var(--font-size-card);
+  line-height: var(--line-height-tight);
+}
+
+.option-row__choices {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* 선택지 버튼: 높이 80px, 한 줄에 나란히 */
+.choice {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 0;
+  min-height: 80px;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border) solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: var(--font-size-card);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  text-align: center;
+}
+
+.choice--ice {
+  border-color: var(--color-ice);
+  background: var(--color-ice-bg);
+  color: var(--color-ice-ink);
+}
+
+.choice--hot {
+  border-color: var(--color-hot);
+  background: var(--color-hot-bg);
+  color: var(--color-hot-ink);
+}
+
+/* 선택됨: 색을 가득 채우고 글자는 흰색(✓도 함께 붙는다) */
+.choice--selected {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+
+.choice--ice.choice--selected {
+  border-color: var(--color-ice-ink);
+  background: var(--color-ice-ink);
+}
+
+.choice--hot.choice--selected {
+  border-color: var(--color-hot-ink);
+  background: var(--color-hot-ink);
+}
+
+.choice:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) {
+  .choice:hover:not(:disabled):not(.choice--selected) {
+    border-color: var(--color-ink);
+  }
+}
+
+/* 재고 때문에 막힌 선택지: 글자는 흐리게, 테두리는 점선, 사유는 또렷하게(경고라서 빨강) */
+.choice:disabled {
+  border-style: dashed;
+  border-color: var(--color-line);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  cursor: not-allowed;
+}
+
+.choice:disabled .choice__text {
+  opacity: 0.5;
+}
+
+.choice__reason {
+  color: var(--color-danger-ink);
+  font-size: var(--font-size-body);
+}
+
+/* 화면 아래 [레시피 보기]: 창이 낮아도 항상 보이게 붙여 둔다 */
+.options__footer {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  padding: var(--space-4) 0 var(--space-5);
+  background: var(--color-bg);
+}
+
+.btn.options__start {
+  width: 100%;
+  min-height: 80px;
+  font-size: var(--font-size-card);
+}

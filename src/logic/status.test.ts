@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { menus } from '../data/menus'
+import type { Stock } from '../data/stock'
+import type { Menu } from '../data/types'
 import { americano } from '../data/menus/americano'
 import { cappuccino } from '../data/menus/cappuccino'
 import { grapefruitAde } from '../data/menus/grapefruit_ade'
@@ -8,7 +10,16 @@ import { lemonAde } from '../data/menus/lemon_ade'
 import { matchaLatte } from '../data/menus/matcha_latte'
 import { oatLatte } from '../data/menus/oat_latte'
 import { strawberryLatte } from '../data/menus/strawberry_latte'
-import { menuStatus, optionChoices, statusOf, unavailableTemps } from './status'
+import { defaultOptions } from './recipe'
+import {
+  initialOptions,
+  menuStatus,
+  neededSubstitutes,
+  optionChoices,
+  statusOf,
+  switchedNotice,
+  unavailableTemps,
+} from './status'
 import { resolveOrder } from './substitution'
 import { opts, soldOut } from './testHelpers'
 
@@ -163,6 +174,100 @@ describe('메뉴 카드의 불가능한 온도', () => {
   })
 })
 
+describe('옵션 화면을 열 때 미리 선택되는 옵션', () => {
+  it('재고가 모두 있으면 메뉴의 기본 옵션이 선택된다', () => {
+    for (const menu of menus) expect(initialOptions(menu, soldOut()), menu.id).toEqual(defaultOptions(menu))
+  })
+
+  it('얼음이 품절이면 아이스가 기본인 메뉴는 핫이 선택된다', () => {
+    expect(initialOptions(latte, soldOut('ice'))).toEqual({ ...defaultOptions(latte), temp: 'hot' })
+  })
+
+  it('시럽과 바닐라 시럽이 모두 품절이면 당도 없음이 선택된다', () => {
+    expect(initialOptions(matchaLatte, soldOut('syrup', 'vanilla_syrup'))).toEqual({
+      ...defaultOptions(matchaLatte),
+      sweetness: 'none',
+    })
+  })
+
+  it('기본 옵션이 대체만 하면 되는 상태면 기본 옵션을 그대로 선택한다', () => {
+    expect(initialOptions(oatLatte, soldOut('oat_milk'))).toEqual(defaultOptions(oatLatte))
+  })
+
+  it('어느 옵션으로도 못 만들면 기본 옵션을 그대로 돌려준다', () => {
+    expect(initialOptions(latte, soldOut('espresso'))).toEqual(defaultOptions(latte))
+    expect(initialOptions(strawberryLatte, soldOut('ice'))).toEqual(defaultOptions(strawberryLatte))
+  })
+
+  it('카드가 제조 불가가 아닌 메뉴는 열었을 때 선택된 옵션으로 항상 만들 수 있다', () => {
+    const stocks = [
+      soldOut(),
+      soldOut('ice'),
+      soldOut('espresso'),
+      soldOut('oat_milk'),
+      soldOut('ice', 'oat_milk'),
+      soldOut('syrup', 'vanilla_syrup'),
+      soldOut('ice', 'syrup', 'vanilla_syrup'),
+      soldOut('milk'),
+      soldOut('sparkling_water'),
+      soldOut('milk', 'oat_milk', 'soy_milk'),
+    ]
+    for (const stock of stocks) {
+      for (const menu of menus) {
+        const lines = resolveOrder(menu, initialOptions(menu, stock), stock)
+        const cardBlocked = menuStatus(menu, stock).status === 'blocked'
+        expect(statusOf(lines) === 'blocked', menu.id).toBe(cardBlocked)
+      }
+    }
+  })
+})
+
+describe('옵션 화면 위 안내와 대체 필요', () => {
+  const substitutesAtStart = (menu: Menu, stock: Stock) => neededSubstitutes(menu, initialOptions(menu, stock), stock)
+
+  it('재고가 모두 있으면 안내도 대체 필요도 없다', () => {
+    for (const menu of menus) {
+      expect(switchedNotice(menu, soldOut()), menu.id).toBeUndefined()
+      expect(substitutesAtStart(menu, soldOut()), menu.id).toEqual([])
+    }
+  })
+
+  it('얼음 품절로 핫으로 자동 전환되면 안내만 나오고 대체 필요는 나오지 않는다', () => {
+    const stock = soldOut('ice')
+    expect(switchedNotice(latte, stock)).toBe('얼음 품절로 HOT으로 바꿨어요')
+    expect(substitutesAtStart(latte, stock)).toEqual([])
+  })
+
+  it('재료만 대체하면 되는 경우에는 대체 필요만 나오고 안내는 나오지 않는다', () => {
+    const stock = soldOut('oat_milk')
+    expect(switchedNotice(oatLatte, stock)).toBeUndefined()
+    expect(substitutesAtStart(oatLatte, stock)).toEqual(['오트밀크 → 우유 대체'])
+  })
+
+  it('자동 전환도 되고 재료 대체도 필요하면 둘 다 따로 나온다', () => {
+    const stock = soldOut('ice', 'oat_milk')
+    expect(switchedNotice(oatLatte, stock)).toBe('얼음 품절로 HOT으로 바꿨어요')
+    expect(substitutesAtStart(oatLatte, stock)).toEqual(['오트밀크 → 우유 대체'])
+  })
+
+  it('당도가 자동으로 바뀌면 그 안내가 나오고 대체 필요는 나오지 않는다', () => {
+    const stock = soldOut('syrup', 'vanilla_syrup')
+    expect(switchedNotice(matchaLatte, stock)).toBe('시럽 품절로 당도를 바꿨어요 (없음)')
+    expect(substitutesAtStart(matchaLatte, stock)).toEqual([])
+  })
+
+  it('어느 옵션으로도 못 만들면 자동 전환 안내가 없다', () => {
+    expect(switchedNotice(latte, soldOut('espresso'))).toBeUndefined()
+  })
+
+  it('대체 필요는 지금 고른 옵션을 따라 달라진다', () => {
+    // 시럽만 품절: 당도 보통이면 바닐라 시럽 대체가 필요하고, 당도 없음이면 필요 없다
+    const stock = soldOut('syrup')
+    expect(neededSubstitutes(matchaLatte, opts({ sweetness: 'normal' }), stock)).toEqual(['시럽 → 바닐라 시럽 대체'])
+    expect(neededSubstitutes(matchaLatte, opts({ sweetness: 'none' }), stock)).toEqual([])
+  })
+})
+
 describe('옵션 화면 선택지', () => {
   it('얼음이 품절이면 아이스 옵션이 비활성화되고 사유가 나오며 핫은 고를 수 있다', () => {
     const { temp } = optionChoices(latte, opts(), soldOut('ice'))
@@ -186,6 +291,10 @@ describe('옵션 화면 선택지', () => {
   it('원두가 품절이면 샷 추가 선택지도 모두 막힌다', () => {
     const { extraShots } = optionChoices(latte, opts(), soldOut('espresso'))
     expect(extraShots.every((c) => c.disabled && c.reason === '에스프레소 품절')).toBe(true)
+  })
+
+  it('온도 선택지는 메뉴 카드와 같이 아이스, 핫 순서로 나온다', () => {
+    expect(optionChoices(latte, opts(), soldOut()).temp.map((c) => c.value)).toEqual(['ice', 'hot'])
   })
 
   it('핫만 파는 메뉴는 온도 선택지가 핫 하나뿐이다', () => {

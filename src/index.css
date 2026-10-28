@@ -94,6 +94,7 @@ button {
 
 /* 상태 배지: 대체 필요(노랑)와 제조 불가(빨강). 글자가 상태를 말하고 색은 거든다 */
 .badge {
+  display: block;
   margin: 0;
   padding: var(--space-2) var(--space-3);
   border: var(--border) solid;
@@ -109,6 +110,13 @@ button {
 /* 이유는 한 줄에 하나씩 */
 .badge__line {
   display: block;
+}
+
+/* 안내: 문제가 아니라 알려 주는 것이라 색을 쓰지 않는다 */
+.badge--info {
+  background: var(--color-surface);
+  border-color: var(--color-ink);
+  color: var(--color-ink);
 }
 
 .badge--sub {

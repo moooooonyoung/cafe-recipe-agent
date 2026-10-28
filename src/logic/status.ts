@@ -43,16 +43,47 @@ export function menuStatus(menu: Menu, stock: Stock): MenuStatus {
   if (status === 'substitute') return { status, reasons: substituteReasons(lines) }
 
   const blocked = blockedReason(lines)
-  for (const alt of alternatives(menu, base)) {
-    const altLines = resolveOrder(menu, alt.options, stock)
-    const altStatus = statusOf(altLines)
-    if (altStatus === 'blocked') continue
-    // 첫 줄: 막힌 이유와 바꿀 옵션. 바꾼 옵션으로 만들 때도 대체가 필요하면 그 이유를 다음 줄에 더한다.
-    const reasons = [blocked + strings.reason.separator + alt.label]
-    if (altStatus === 'substitute') reasons.push(...substituteReasons(altLines))
-    return { status: 'substitute', reasons }
+  const alt = workableAlternative(menu, base, stock)
+  if (!alt) return { status: 'blocked', reasons: [blocked] }
+  // 첫 줄: 막힌 이유와 바꿀 옵션. 바꾼 옵션으로 만들 때도 대체가 필요하면 그 이유를 다음 줄에 더한다.
+  const reasons = [blocked + strings.reason.separator + alt.label]
+  if (statusOf(alt.lines) === 'substitute') reasons.push(...substituteReasons(alt.lines))
+  return { status: 'substitute', reasons }
+}
+
+// 옵션 화면을 열 때 미리 선택해 둘 옵션: 기본 옵션이고, 재고 때문에 막혀 있으면
+// 메뉴 카드가 알려준 대로 만들 수 있는 옵션으로 바꾼다. 어느 옵션으로도 못 만들면 기본 옵션 그대로.
+export function initialOptions(menu: Menu, stock: Stock): Options {
+  const base = defaultOptions(menu)
+  if (statusOf(resolveOrder(menu, base, stock)) !== 'blocked') return base
+  return workableAlternative(menu, base, stock)?.options ?? base
+}
+
+// 옵션 화면이 열릴 때 기본 옵션을 자동으로 바꿨다면 그 안내 문장. 바꾸지 않았으면 undefined.
+// 예: '얼음 품절로 HOT으로 바꿨어요'. 재료 대체와는 별개라서 '대체 필요'와 섞어 쓰지 않는다.
+export function switchedNotice(menu: Menu, stock: Stock): string | undefined {
+  const base = defaultOptions(menu)
+  const start = initialOptions(menu, stock)
+  const cause = blockedReason(resolveOrder(menu, base, stock))
+  if (start.temp !== base.temp) return strings.options.switchedTemp[start.temp](cause)
+  if (start.sweetness !== base.sweetness) {
+    return strings.options.switchedSweetness(cause, strings.sweetness[start.sweetness])
   }
-  return { status: 'blocked', reasons: [blocked] }
+  return undefined
+}
+
+// 지금 고른 옵션으로 만들 때 실제로 필요한 재료 대체, 재료마다 한 줄. 필요 없으면 빈 배열.
+export function neededSubstitutes(menu: Menu, options: Options, stock: Stock): string[] {
+  return substituteReasons(resolveOrder(menu, options, stock))
+}
+
+// 기본 옵션이 막혔을 때 바꿔서 만들 수 있는 첫 번째 옵션(없으면 undefined)
+function workableAlternative(menu: Menu, base: Options, stock: Stock) {
+  for (const alt of alternatives(menu, base)) {
+    const lines = resolveOrder(menu, alt.options, stock)
+    if (statusOf(lines) !== 'blocked') return { ...alt, lines }
+  }
+  return undefined
 }
 
 // 재고 때문에 막히면 바꿔볼 만한 옵션: 온도, 당도(시럽이 필요한 메뉴만). 하나씩만 바꾼다.
@@ -78,6 +109,8 @@ export function unavailableTemps(menu: Menu, stock: Stock): Temperature[] {
   const blocked = choices.filter((c) => c.disabled).map((c) => c.value)
   return blocked.length === choices.length ? [] : blocked
 }
+
+const tempOrder: readonly Temperature[] = ['ice', 'hot']
 
 export type Choice<V> = { value: V; disabled: boolean; reason?: string }
 
@@ -105,8 +138,10 @@ function choicesFor<K extends keyof Options>(
 // 옵션 화면용: 지금 선택한 다른 옵션은 그대로 두고, 선택지마다 만들 수 있는지 계산한다.
 // 만들 수 없게 되는 선택지는 disabled와 사유(예: '얼음 품절')를 돌려준다.
 export function optionChoices(menu: Menu, options: Options, stock: Stock): OptionChoices {
+  // 메뉴 카드와 같이 아이스, 핫 순서로 보여준다
+  const temps = tempOrder.filter((temp) => menu.temps.includes(temp))
   return {
-    temp: choicesFor(menu, options, stock, 'temp', menu.temps),
+    temp: choicesFor(menu, options, stock, 'temp', temps),
     size: choicesFor(menu, options, stock, 'size', ['regular', 'large']),
     extraShots: menu.category === 'coffee' ? choicesFor(menu, options, stock, 'extraShots', [0, 1, 2]) : [],
     sweetness: menu.sweetener ? choicesFor(menu, options, stock, 'sweetness', sweetnessLevels) : [],

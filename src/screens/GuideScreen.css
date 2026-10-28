@@ -1,0 +1,281 @@
+/* 화면 높이에 딱 맞춘다: 위 요약·배너와 왼쪽 재료는 고정, 오른쪽 단계 목록만 스크롤된다 */
+.guide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100vh;
+  height: 100dvh;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--space-4) var(--page-pad);
+}
+
+/* 옵션 요약: 32px 이상. 누르면 옵션 화면으로 돌아간다 */
+.guide__bar {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-5);
+  width: 100%;
+  min-height: 88px;
+  padding: var(--space-3) var(--space-5);
+  border: var(--border) solid var(--color-ink);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  text-align: left;
+}
+
+.guide__name {
+  font-size: var(--font-size-summary);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.guide__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-5);
+  margin-right: auto;
+  font-size: var(--font-size-summary);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.guide__summary .temp {
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  font-size: var(--font-size-summary);
+}
+
+.guide__edit {
+  color: var(--color-ink-muted);
+}
+
+@media (hover: hover) {
+  .guide__bar:hover {
+    background: var(--color-bg);
+  }
+}
+
+/* 대체 제안 배너: 질문 한 줄 + [대체 적용] [취소] */
+.guide__suggest {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+}
+
+.guide__suggest .badge__label {
+  font-size: var(--font-size-card);
+}
+
+.guide__suggest-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* 본문: 왼쪽 재료(고정 폭), 오른쪽 단계 */
+.guide__body {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: var(--space-5);
+  min-height: 0;
+}
+
+.guide__col {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.guide__heading {
+  margin: 0 0 var(--space-2);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+}
+
+.ingredients {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ingredient {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border) solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.ingredient__main {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--font-size-card);
+  line-height: var(--line-height-tight);
+}
+
+.ingredient__name {
+  font-weight: var(--font-weight-bold);
+}
+
+/* 품절 재료(대체 여부를 정하는 중이거나 제조 불가): 빨간 테두리 */
+.ingredient--out {
+  border-color: var(--color-danger);
+}
+
+/* 단계 목록: 현재 단계가 가장 크고 굵다 */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  min-height: 72px;
+  padding: var(--space-3) var(--space-4);
+  border: var(--border) solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: var(--font-size-step);
+  line-height: var(--line-height-tight);
+  text-align: left;
+}
+
+/* 번호는 실제로 순서가 있는 내용이라 붙인다. 체크하면 ✓로 바뀐다 */
+.step__mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: var(--border) solid var(--color-ink);
+  border-radius: 50%;
+  font-size: var(--font-size-card);
+  font-weight: var(--font-weight-bold);
+}
+
+.step--current {
+  min-height: 112px;
+  border: 4px solid var(--color-ink);
+  font-size: var(--font-size-summary);
+  font-weight: var(--font-weight-bold);
+}
+
+.step--current .step__mark {
+  width: 56px;
+  height: 56px;
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+
+/* 완료한 단계: 흐리게 + ✓ (탭하면 해제) */
+.step--done {
+  opacity: 0.55;
+}
+
+.step:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.step:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+@media (hover: hover) {
+  .step:hover:not(:disabled):not(.step--current) {
+    border-color: var(--color-ink);
+  }
+}
+
+/* 마지막 단계까지 체크하면 화면 아래에 고정되어 나타난다 */
+.guide__done {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+  margin-top: var(--space-3);
+  padding: var(--space-4) 0 var(--space-1);
+  border-top: 3px solid var(--color-ink);
+  background: var(--color-bg);
+}
+
+.guide__done-title {
+  margin: 0;
+  font-size: var(--font-size-summary);
+  font-weight: var(--font-weight-bold);
+}
+
+.btn.guide__finish {
+  flex: 1;
+  min-height: 80px;
+  font-size: var(--font-size-card);
+}
+
+/* 제조 불가 */
+.guide__blocked {
+  padding: var(--space-5);
+  border: 4px solid var(--color-danger);
+  border-radius: var(--radius);
+  background: var(--color-danger-bg);
+  color: var(--color-danger-ink);
+}
+
+.guide__blocked p {
+  margin: 0;
+}
+
+.guide__blocked-title {
+  font-size: var(--font-size-summary);
+  font-weight: var(--font-weight-bold);
+}
+
+.guide__blocked .guide__blocked-reason {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-card);
+  font-weight: var(--font-weight-bold);
+}
+
+.guide__blocked-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+/* 좁은 창(세로 모드·스마트폰은 범위 밖): 한 열로 쌓고 화면 전체가 스크롤된다 */
+@media (max-width: 800px) {
+  .guide {
+    height: auto;
+  }
+
+  .guide__body {
+    grid-template-columns: 1fr;
+  }
+
+  .guide__col {
+    overflow: visible;
+  }
+}

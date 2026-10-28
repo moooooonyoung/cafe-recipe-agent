@@ -29,6 +29,8 @@ export type ResolvedLine = {
   amount: Qty // use 기준 양
   state: 'ok' | 'substituted' | 'suggest' | 'blocked'
   candidate?: Substitute // suggest일 때 제안하는 후보
+  // blocked일 때: 재고에 있는 후보가 있었지만 모두 [취소]해서 막힌 경우(후보가 없거나 모두 품절이면 없다)
+  cancelled?: true
 }
 
 function scale(amount: Qty, ratio = 1): Qty {
@@ -51,7 +53,9 @@ function resolveLine(line: Line, menu: Menu, stock: Stock, decisions: Decisions)
   const next = candidates.find((c) => !rejected.includes(c.id) && isAvailable(c.id, stock))
   if (next) return { id, use: id, amount, state: 'suggest', candidate: next }
 
-  return { id, use: id, amount, state: 'blocked' }
+  // 남은 후보가 없다. 재고에 있는 후보가 있었다면 그것을 모두 취소해서 막힌 것이다.
+  const cancelled = candidates.some((c) => isAvailable(c.id, stock))
+  return cancelled ? { id, use: id, amount, state: 'blocked', cancelled: true } : { id, use: id, amount, state: 'blocked' }
 }
 
 // 옵션과 재고에 맞춘 재료 목록. 대체는 한 단계만 본다.

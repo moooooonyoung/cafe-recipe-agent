@@ -7,7 +7,7 @@ import OptionsScreen from './screens/OptionsScreen'
 import StockScreen from './screens/StockScreen'
 import { useStock } from './useStock'
 
-// 라우팅 라이브러리 없이 화면 상태로 전환한다. 가이드 화면은 7단계에서 채운다.
+// 라우팅 라이브러리 없이 화면 상태로 전환한다.
 type Screen =
   | { name: 'menu' }
   | { name: 'stock' }
@@ -36,7 +36,9 @@ export default function App() {
         <GuideScreen
           menuId={screen.menuId}
           options={screen.options}
-          onBack={() => setScreen({ name: 'options', menuId: screen.menuId })}
+          stock={stock}
+          onChangeOptions={() => setScreen({ name: 'options', menuId: screen.menuId })}
+          onFinish={toMenu}
         />
       )
     default:

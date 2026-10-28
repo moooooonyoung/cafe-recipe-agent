@@ -1,5 +1,6 @@
 import type { Unit } from '../../data/ingredients'
 import type { Category, ExtraShots, FillLevel, Size, Sweetness, Temperature } from '../../data/types'
+import { euro } from './josa'
 
 // 화면에 보이는 한국어 문구. 영어를 추가하면 en.ts를 같은 모양으로 만든다.
 export const ko = {
@@ -53,10 +54,26 @@ export const ko = {
     } satisfies Record<Temperature, (cause: string) => string>,
     switchedSweetness: (cause: string, label: string) => `${cause}로 당도를 바꿨어요 (${label})`,
   },
-  // 제조 가이드 화면(7단계에서 채운다)
+  // 제조 가이드 화면
   guide: {
-    back: '옵션 바꾸기',
-    placeholder: '제조 가이드는 7단계에서 만듭니다',
+    editOptions: '옵션 바꾸기', // 옵션 요약을 누르면 옵션 화면으로 돌아간다
+    ingredients: '재료',
+    stepsLabel: '만드는 순서', // 단계 목록의 이름(화면 낭독기용)
+    soldOut: '✕ 품절',
+    // 대체한 재료에 붙는 배지. from은 원래 재료 이름
+    substituted: (from: string) => `대체 · ${from} 대신`,
+    // 대체 제안 배너. from은 품절된 재료, to는 대체 후보
+    suggest: (from: string, to: string) => `${from} 품절 → ${euro(to)} 대체할까요?`,
+    apply: '대체 적용',
+    cancel: '취소',
+    blocked: '✕ 제조 불가',
+    // 제조 불가 패널의 설명: 후보를 모두 취소했는지, 처음부터 대체할 수 없었는지
+    blockedHint: {
+      cancelled: '대체 후보를 모두 취소했어요',
+      unavailable: '대체할 수 있는 재료가 없어요',
+    },
+    done: '✓ 완료',
+    toMenu: '메뉴로 돌아가기',
   },
   // 메뉴 선택 화면
   menu: {

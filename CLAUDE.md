@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Working rules
 
 - Implement in the step order given in `PLAN.md` §5.
-- When a step is done, run the tests and show the user the results first, then commit.
+- When a step is done, run `npm run check` (type-check, tests, build) and show the user the results first, then commit.
 - Keep the code simple enough that the author can explain it themselves.
 - Create and edit files with the file tools (Write/Edit), not shell commands (heredocs, `sed`, scripts that rewrite files).
 
@@ -19,6 +19,7 @@ Node is installed through nvm, so a non-interactive shell needs `. ~/.nvm/nvm.sh
 
 - `npm run dev`: Vite dev server
 - `npm run build`: type-check (`tsc`) then production build into `dist/`
+- `npm run check`: type-check (`tsc --noEmit`), run all Vitest tests, then production build. Use this one to verify a change instead of running the three separately.
 - `npm test`: run all Vitest tests once; `npm run test:watch` for watch mode
 - Single test file: `npx vitest run src/i18n/i18n.test.ts`; by test name: `npx vitest run -t "<name>"`
 

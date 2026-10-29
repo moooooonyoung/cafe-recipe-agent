@@ -16,7 +16,7 @@
 ### 기술 스택·배포
 - 프론트엔드만 있는 SPA: React + Vite + TypeScript. 서버 없음.
 - 레시피·재고 샘플 데이터는 JSON/TS 파일.
-- 정적 호스팅(Vercel 또는 GitHub Pages)에 배포.
+- 정적 호스팅은 **GitHub Pages**로 확정(10/29). main에 push하면 GitHub Actions가 `npm run check`를 돌리고, 통과하면 서버에서 빌드한 `dist`를 배포한다(`.github/workflows/deploy.yml`). `dist`는 저장소에 커밋하지 않는다. Vite `base`는 저장소 이름(`/cafe-recipe-agent/`)이다.
 - 규칙 로직 테스트는 Vitest.
 
 ### 기기·입력
